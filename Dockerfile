@@ -11,6 +11,7 @@ ENV VELERO_VERSION=1.7.0
 USER root
 RUN apt-get update -y \
  && apt-get install python3-pip python3-venv libpq-dev jq libltdl7 netcat sshpass rsync python3-mysqldb -y \
+ && apt-get install certbot=1.12.0-2 python3-certbot-dns-rfc2136=1.10.1-1 -y \
  && apt-get clean -y
 RUN pip3 install awscli \
     ansible==2.10.7 \
