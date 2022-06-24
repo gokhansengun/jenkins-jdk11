@@ -1,5 +1,5 @@
 # lts with jdk8, starting with 2.303 jdk11 is the default
-FROM jenkins/jenkins:2.332.3-lts-jdk11
+FROM jenkins/jenkins:2.346.1-lts-jdk11
 
 # https://docs.docker.com/engine/reference/builder/#automatic-platform-args-in-the-global-scope
 ARG TARGETARCH
@@ -36,7 +36,7 @@ RUN curl -L https://github.com/vmware-tanzu/velero/releases/download/v${VELERO_V
     rm -rf /tmp/velero-tar.gz velero-v${VELERO_VERSION}-${TARGETOS}-${TARGETARCH}
 
 RUN curl -L -o /tmp/vault.zip \
-    https://releases.hashicorp.com/vault/1.9.3/vault_1.9.3_${TARGETOS}_${TARGETARCH}.zip && \
+    https://releases.hashicorp.com/vault/1.11.0/vault_1.11.0_${TARGETOS}_${TARGETARCH}.zip && \
     cd /tmp && unzip vault.zip && mv vault /usr/bin/ && \
     rm -rf /tmp/vault.zip
 
