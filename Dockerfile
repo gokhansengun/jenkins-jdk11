@@ -1,5 +1,5 @@
 # lts with jdk8, starting with 2.303 jdk11 is the default
-FROM jenkins/jenkins:2.346.3-lts-jdk11
+FROM jenkins/jenkins:2.346.3-2-lts-jdk11
 
 # https://docs.docker.com/engine/reference/builder/#automatic-platform-args-in-the-global-scope
 ARG TARGETARCH
@@ -10,16 +10,18 @@ ENV VELERO_VERSION=1.7.0
 # change user to root to install some tools
 USER root
 RUN apt-get update -y \
- && apt-get install python3-pip python3-venv libpq-dev jq libltdl7 netcat sshpass rsync python3-mysqldb -y \
- && apt-get install certbot=1.12.0-2 python3-certbot-dns-rfc2136=1.10.1-1 -y \
- && apt-get clean -y
+    && apt-get install python3-pip python3-venv libpq-dev jq libltdl7 netcat sshpass rsync python3-mysqldb -y \
+    && apt-get clean -y
 RUN pip3 install awscli \
     ansible==2.10.7 \
     openshift==0.12.1 \
     docker==5.0.0 \
     ansible-modules-hashivault==4.2.3 \
     dnspython==2.2.0 \
-    psycopg2==2.9.3
+    psycopg2==2.9.3 \
+    certbot==1.29.0 \
+    certbot-dns-rfc2136==1.29.0 \
+    certbot-dns-cloudflare==1.29.0
 
 RUN ansible-galaxy collection install kubernetes.core:==2.2.3
 
