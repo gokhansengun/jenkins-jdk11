@@ -1,17 +1,20 @@
 # lts with jdk8, starting with 2.303 jdk11 is the default
-FROM jenkins/jenkins:2.361.2-lts-jdk11
+FROM jenkins/jenkins:2.361.3-lts-jdk11
 
 # https://docs.docker.com/engine/reference/builder/#automatic-platform-args-in-the-global-scope
 ARG TARGETARCH
 ARG TARGETOS
 
 ENV VELERO_VERSION=1.7.0
+ENV HELM_VERSION=v3.10.1
+ENV KUBECTL_VERSION=v1.24.7
 
 # change user to root to install some tools
 USER root
 RUN apt-get update -y \
     && apt-get install python3-pip python3-venv libpq-dev jq libltdl7 netcat sshpass rsync python3-mysqldb -y \
     && apt-get clean -y
+
 RUN pip3 install awscli \
     ansible==2.10.7 \
     openshift==0.12.1 \
@@ -41,6 +44,16 @@ RUN curl -L -o /tmp/vault.zip \
     https://releases.hashicorp.com/vault/1.11.0/vault_1.11.0_${TARGETOS}_${TARGETARCH}.zip && \
     cd /tmp && unzip vault.zip && mv vault /usr/bin/ && \
     rm -rf /tmp/vault.zip
+
+RUN curl -LO https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${TARGETARCH}/kubectl && \
+    chmod +x kubectl && \
+    mv kubectl /usr/local/bin/
+
+RUN curl -o /tmp/helm.tar.gz \
+      https://get.helm.sh/helm-${HELM_VERSION}-linux-${TARGETARCH}.tar.gz && \
+    tar -C /tmp -xvf /tmp/helm.tar.gz && \
+    mv /tmp/linux-${TARGETARCH}/helm /usr/local/bin/helm && \
+    rm -rf /tmp/linux-${TARGETARCH} && rm -rf /tmp/helm.tar.gz
 
 # overrite install-plugins to limit concurrent downloads
 COPY scripts/install-plugins.sh /usr/local/bin/install-plugins.sh
