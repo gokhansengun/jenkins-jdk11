@@ -26,7 +26,7 @@ RUN pip3 install awscli \
     certbot-dns-rfc2136==1.29.0 \
     certbot-dns-cloudflare==1.29.0
 
-RUN ansible-galaxy collection install kubernetes.core:==2.2.3
+RUN ansible-galaxy collection install kubernetes.core:==2.2.3 ansible.utils:==2.7.0
 
 RUN curl -L https://github.com/mikefarah/yq/releases/download/3.3.2/yq_${TARGETOS}_${TARGETARCH} -o /usr/bin/yq && \
     chmod +x /usr/bin/yq
