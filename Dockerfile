@@ -1,13 +1,13 @@
 # lts with jdk8, starting with 2.303 jdk11 is the default
-FROM jenkins/jenkins:2.361.4-lts-jdk11
+FROM jenkins/jenkins:2.375.1-lts-jdk11
 
 # https://docs.docker.com/engine/reference/builder/#automatic-platform-args-in-the-global-scope
 ARG TARGETARCH
 ARG TARGETOS
 
 ENV VELERO_VERSION=1.7.0
-ENV HELM_VERSION=v3.10.1
-ENV KUBECTL_VERSION=v1.24.7
+ENV HELM_VERSION=v3.10.3
+ENV KUBECTL_VERSION=v1.24.8
 
 # change user to root to install some tools
 USER root
