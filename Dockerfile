@@ -15,16 +15,9 @@ RUN apt-get update -y \
     && apt-get install python3-pip python3-venv libpq-dev jq libltdl7 netcat sshpass rsync python3-mysqldb -y \
     && apt-get clean -y
 
-RUN pip3 install awscli \
-    cryptography==39.0.0 \
-    certbot==2.2.0 \
-    certbot-dns-cloudflare==2.2.0 \
-    ansible==2.10.7 \
-    openshift==0.12.1 \
-    docker==5.0.0 \
-    ansible-modules-hashivault==4.2.3 \
-    dnspython==2.2.0 \
-    psycopg2==2.9.3
+COPY requirements.txt /tmp/requirements.txt
+
+RUN pip3 install -r /tmp/requirements.txt
 
 RUN ansible-galaxy collection install kubernetes.core:==2.2.3 ansible.utils:==2.7.0
 
