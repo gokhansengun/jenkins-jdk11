@@ -1,16 +1,17 @@
 # lts with jdk8, starting with 2.303 jdk11 is the default
-FROM jenkins/jenkins:2.401.1-lts-jdk11
+FROM jenkins/jenkins:2.401.2-lts-jdk11
 
 # https://docs.docker.com/engine/reference/builder/#automatic-platform-args-in-the-global-scope
 ARG TARGETARCH
 ARG TARGETOS
 
 ENV VELERO_VERSION=1.7.0
-ENV HELM_VERSION=v3.12.0
-ENV KUBECTL_VERSION=v1.24.10
+ENV HELM_VERSION=v3.12.2
+ENV KUBECTL_VERSION=v1.26.6
 
 # change user to root to install some tools
 USER root
+
 RUN apt-get update -y \
     && apt-get install python3-pip python3-venv libpq-dev jq libltdl7 netcat sshpass rsync python3-mysqldb -y \
     && apt-get clean -y
