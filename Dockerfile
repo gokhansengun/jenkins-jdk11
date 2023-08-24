@@ -1,38 +1,48 @@
 # lts with jdk8, starting with 2.303 jdk11 is the default
-FROM jenkins/jenkins:2.401.3-lts-jdk11
+FROM jenkins/jenkins:2.414.1-lts-jdk11
 
 # https://docs.docker.com/engine/reference/builder/#automatic-platform-args-in-the-global-scope
 ARG TARGETARCH
 ARG TARGETOS
 
 ENV VELERO_VERSION=1.7.0
-ENV HELM_VERSION=v3.12.2
+ENV HELM_VERSION=v3.12.3
 ENV KUBECTL_VERSION=v1.26.6
 
 # change user to root to install some tools
 USER root
 
 RUN apt-get update -y \
-    && apt-get install python3-pip python3-venv libpq-dev jq libltdl7 netcat sshpass rsync python3-mysqldb -y \
+    && apt-get install python3-pip python3-venv libpq-dev jq libltdl7 netcat-traditional sshpass rsync -y \
     && apt-get clean -y
 
+COPY scripts/* /usr/local/bin/
+
+ENV PIP_BREAK_SYSTEM_PACKAGES 1
+
+RUN fix-pip-dependencies.sh
+
 COPY requirements.txt /tmp/requirements.txt
+COPY requirements-ansible.yml /tmp/
 
-RUN pip3 install -r /tmp/requirements.txt
+RUN pip install --no-cache-dir --no-build-isolation --no-deps -r /tmp/requirements.txt
 
-RUN ansible-galaxy collection install kubernetes.core:==2.2.3 ansible.utils:==2.7.0
+# TODO: gseng - we may like to proxy ansible-galaxy over Nexus as well
+RUN ansible-galaxy collection install -p /usr/share/ansible/collections -r /tmp/requirements-ansible.yml
 
 RUN curl -L https://github.com/mikefarah/yq/releases/download/3.3.2/yq_${TARGETOS}_${TARGETARCH} -o /usr/bin/yq && \
     chmod +x /usr/bin/yq
 
-RUN curl -L -o /usr/bin/aws-iam-authenticator \
-    https://amazon-eks.s3.us-west-2.amazonaws.com/1.17.9/2020-08-04/bin/${TARGETOS}/${TARGETARCH}/aws-iam-authenticator && \
-    chmod +x /usr/bin/aws-iam-authenticator
+# NOTE: gseng - disable aws-iam-authenticator for now
+# RUN curl -L -o /usr/bin/aws-iam-authenticator \
+#     https://amazon-eks.s3.us-west-2.amazonaws.com/1.17.9/2020-08-04/bin/${TARGETOS}/${TARGETARCH}/aws-iam-authenticator && \
+#     chmod +x /usr/bin/aws-iam-authenticator
 
-RUN curl -L https://github.com/vmware-tanzu/velero/releases/download/v${VELERO_VERSION}/velero-v${VELERO_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz -o /tmp/velero-tar.gz && \
-    tar xvf /tmp/velero-tar.gz && \
-    mv velero-v${VELERO_VERSION}-${TARGETOS}-${TARGETARCH}/velero /usr/local/bin && \
-    rm -rf /tmp/velero-tar.gz velero-v${VELERO_VERSION}-${TARGETOS}-${TARGETARCH}
+# NOTE: gseng - disable vmware velero for now
+# RUN curl -L https://github.com/vmware-tanzu/velero/releases/download/v${VELERO_VERSION}/velero-v${VELERO_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz -o /tmp/velero-tar.gz && \
+#     tar xvf /tmp/velero-tar.gz && \
+#     mv velero-v${VELERO_VERSION}-${TARGETOS}-${TARGETARCH}/velero /usr/local/bin && \
+#     rm -rf /tmp/velero-tar.gz velero-v${VELERO_VERSION}-${TARGETOS}-${TARGETARCH}
 
 RUN curl -L -o /tmp/vault.zip \
     https://releases.hashicorp.com/vault/1.11.0/vault_1.11.0_${TARGETOS}_${TARGETARCH}.zip && \
