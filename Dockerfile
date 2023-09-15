@@ -5,7 +5,6 @@ FROM jenkins/jenkins:2.414.1-lts-jdk11
 ARG TARGETARCH
 ARG TARGETOS
 
-ENV VELERO_VERSION=1.7.0
 ENV HELM_VERSION=v3.12.3
 ENV KUBECTL_VERSION=v1.26.6
 
@@ -13,7 +12,7 @@ ENV KUBECTL_VERSION=v1.26.6
 USER root
 
 RUN apt-get update -y \
-    && apt-get install python3-pip python3-venv libpq-dev jq libltdl7 netcat-traditional sshpass rsync -y \
+    && apt-get install python3-pip libpq-dev jq netcat-traditional sshpass rsync vim -y \
     && apt-get clean -y
 
 COPY scripts/* /usr/local/bin/
@@ -37,17 +36,6 @@ RUN curl -L https://github.com/mikefarah/yq/releases/download/3.3.2/yq_${TARGETO
 # RUN curl -L -o /usr/bin/aws-iam-authenticator \
 #     https://amazon-eks.s3.us-west-2.amazonaws.com/1.17.9/2020-08-04/bin/${TARGETOS}/${TARGETARCH}/aws-iam-authenticator && \
 #     chmod +x /usr/bin/aws-iam-authenticator
-
-# NOTE: gseng - disable vmware velero for now
-# RUN curl -L https://github.com/vmware-tanzu/velero/releases/download/v${VELERO_VERSION}/velero-v${VELERO_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz -o /tmp/velero-tar.gz && \
-#     tar xvf /tmp/velero-tar.gz && \
-#     mv velero-v${VELERO_VERSION}-${TARGETOS}-${TARGETARCH}/velero /usr/local/bin && \
-#     rm -rf /tmp/velero-tar.gz velero-v${VELERO_VERSION}-${TARGETOS}-${TARGETARCH}
-
-RUN curl -L -o /tmp/vault.zip \
-    https://releases.hashicorp.com/vault/1.11.0/vault_1.11.0_${TARGETOS}_${TARGETARCH}.zip && \
-    cd /tmp && unzip vault.zip && mv vault /usr/bin/ && \
-    rm -rf /tmp/vault.zip
 
 RUN curl -LO https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${TARGETARCH}/kubectl && \
     chmod +x kubectl && \
